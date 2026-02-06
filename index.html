@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Папка "Дела" + USB + PDA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <img src="icons/malboro.png" class="decor decor1">
+    <img src="icons/zipo.png" class="decor decor2">
+
+    <audio id="sound1" src="sounds/sound1.mp3"></audio>
+    <audio id="sound2" src="sounds/sound2.mp3"></audio>
+    <audio id="sound3" src="sounds/sound3.mp3"></audio>
+    <video id="smokeVideo" src="video/smoke.mp4" autoplay muted loop></video>
+
+
+    <div id="smokeAnim"></div>
+
+
+  <!-- Кнопка добавления файла в папку -->
+  <button id="addBtnFolder">Добавить файл</button>
+
+  <!-- Обёртка экрана (для анимации USB) -->
+  <div id="screenWrapper">
+
+    <!-- Основная папка -->
+    <div class="container folder" id="folder">
+      <div class="cover">
+        Папка "Дела"
+        <div class="cover-back"></div>
+      </div>
+
+      <div class="pages-container">
+        <div class="page-stack" id="stack">
+          <!-- Страницы добавляются из JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- USB-иконка -->
+    <div id="usbIcon"></div>
+
+ <div id="pdaIcon">
+  <div class="hoverbox"></div>
+  <div class="hitbox"></div>
+</div>
+
+
+  <!-- USB окно -->
+  <div class="usb-modal" id="usbModal">
+
+    <div class="usb-window">
+      <div class="usb-title">
+        USB‑хранилище
+        <div class="usb-close" id="usbClose">×</div>
+      </div>
+
+      <div class="usb-grid" id="usbGrid"></div>
+
+      <button class="usb-add" id="addBtnUsb">Добавить файл</button>
+    </div>
+
+  </div>
+
+  <!-- PDA окно -->
+  <div class="pda-modal" id="pdaModal">
+    <div class="pda-window">
+      <div class="pda-title">
+        Личное устройство
+        <div class="pda-close" id="pdaClose">×</div>
+      </div>
+
+      <div class="pda-content">
+        <img id="pdaPhoto" src="icons/pda_photo.jpg" alt="">
+
+        <div id="pdaText">
+          <h3>Данные владельца</h3>
+          <p>Имя: Иван Петров</p>
+          <p>Возраст: 34</p>
+          <p>Статус: Активен</p>
+          <p>Последняя синхронизация: 12.01.2025</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модалка добавления -->
+  <div class="modal" id="addModal">
+    <div class="add-modal-inner">
+      <h2>Добавить файл</h2>
+
+      <input id="fileUrl" type="text" placeholder="Вставьте URL файла">
+
+      <!-- Кнопка загрузки с ПК -->
+      <button id="localUploadBtn">Загрузить с компьютера</button>
+      <input type="file" id="localFile" style="display:none">
+
+      <input id="addContext" type="hidden" value="folder">
+      <button id="confirmAdd">Добавить</button>
+    </div>
+  </div>
+
+  <!-- Полноэкранный просмотр -->
+  <div class="modal" id="viewerModal">
+
+    <div class="viewer-close" id="viewerClose">×</div>
+
+    <!-- Стрелки -->
+    <div class="viewer-arrow viewer-arrow-left" id="viewerPrev">‹</div>
+    <div class="viewer-arrow viewer-arrow-right" id="viewerNext">›</div>
+
+    <!-- Кликабельные зоны -->
+    <div class="viewer-zone viewer-zone-left" id="viewerZoneLeft"></div>
+    <div class="viewer-zone viewer-zone-right" id="viewerZoneRight"></div>
+
+    <!-- Контент -->
+    <div class="viewer-content" id="viewerContent"></div>
+
+    <!-- Кнопка удаления -->
+    <button id="deleteBtn">Уничтожить</button>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
