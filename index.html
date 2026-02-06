@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Папка "Дела" + USB</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Кнопка добавления файла (для папки) -->
+  <button id="addBtnFolder">Добавить файл</button>
+
+  <!-- Обёртка экрана (для анимации с USB) -->
+  <div id="screenWrapper">
+
+    <!-- Основная папка -->
+    <div class="container folder" id="folder">
+      <div class="cover">
+        Папка "Дела"
+        <div class="cover-back"></div>
+      </div>
+
+      <div class="pages-container">
+        <div class="page-stack" id="stack">
+          <!-- Страницы добавляются из JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- USB-устройство сбоку -->
+    <div class="usb" id="usbIcon">
+      <div class="usb-label">USB</div>
+    </div>
+
+  </div>
+
+  <!-- Окно USB-хранилища -->
+  <div class="usb-modal" id="usbModal">
+    <div class="usb-close" id="usbClose">×</div>
+
+    <div class="usb-window">
+      <div class="usb-title">USB‑хранилище</div>
+
+      <div class="usb-grid" id="usbGrid">
+        <!-- Элементы USB-файлов добавляются из JS -->
+      </div>
+
+      <button class="usb-add" id="addBtnUsb">Добавить файл</button>
+    </div>
+  </div>
+
+  <!-- Универсальная модалка добавления файла -->
+  <div class="modal" id="addModal">
+    <div class="add-modal-inner">
+      <h2>Добавить файл</h2>
+      <input id="fileUrl" type="text" placeholder="Вставьте URL файла">
+      <input id="addContext" type="hidden" value="folder">
+      <button id="confirmAdd">Добавить</button>
+    </div>
+  </div>
+
+  <!-- Полноэкранный просмотр -->
+  <div class="modal" id="viewerModal">
+    <div class="viewer-close" id="viewerClose">×</div>
+
+    <!-- Стрелки по краям (полупрозрачные) -->
+    <div class="viewer-arrow viewer-arrow-left" id="viewerPrev">‹</div>
+    <div class="viewer-arrow viewer-arrow-right" id="viewerNext">›</div>
+
+    <!-- Кликабельные зоны слева/справа -->
+    <div class="viewer-zone viewer-zone-left" id="viewerZoneLeft"></div>
+    <div class="viewer-zone viewer-zone-right" id="viewerZoneRight"></div>
+
+    <!-- Контент (картинка/видео/YouTube) -->
+    <div class="viewer-content" id="viewerContent"></div>
+
+    <!-- Кнопка уничтожить -->
+    <button id="deleteBtn">Уничтожить</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
