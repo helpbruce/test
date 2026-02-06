@@ -6,11 +6,9 @@
 <title>Папка Дела</title>
 
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
+/* ---------------- БАЗОВЫЕ СТИЛИ (как у тебя) ---------------- */
+
+*{margin:0;padding:0;box-sizing:border-box;}
 
 body{
 height:100vh;
@@ -22,8 +20,7 @@ overflow:hidden;
 font-family:Arial;
 }
 
-/* ---------------- ПАПКА ---------------- */
-
+/* Папка */
 .container{
 position:relative;
 width:440px;
@@ -50,9 +47,7 @@ transition:transform 1.6s ease;
 z-index:10;
 }
 
-.folder.open .cover{
-transform:rotateY(-180deg);
-}
+.folder.open .cover{transform:rotateY(-180deg);}
 
 .cover-back{
 position:absolute;
@@ -61,8 +56,6 @@ background:linear-gradient(135deg,#e8d9c0,#d0b89a);
 border-radius:12px;
 transform:rotateY(180deg);
 }
-
-/* ---------------- ВНУТРЕННОСТЬ ---------------- */
 
 .pages-container{
 position:absolute;
@@ -75,9 +68,7 @@ box-shadow:inset 0 0 40px rgba(0,0,0,0.4);
 pointer-events:none;
 }
 
-.folder.open .pages-container{
-pointer-events:auto;
-}
+.folder.open .pages-container{pointer-events:auto;}
 
 .page-stack{
 width:100%;
@@ -87,8 +78,6 @@ align-items:center;
 justify-content:center;
 position:relative;
 }
-
-/* ---------------- ЛИСТЫ ---------------- */
 
 .page{
 position:absolute;
@@ -111,26 +100,11 @@ height:100%;
 object-fit:contain;
 }
 
-/* Центр страницы */
-.page.active{
-z-index:5;
-transform:translateX(0) scale(1);
-}
+.page.active{z-index:5;transform:translateX(0) scale(1);}
+.page.to-left{z-index:3;transform:translateX(-500px) rotate(-12deg);}
+.page.next{z-index:4;transform:translateX(40px) rotate(3deg);}
 
-/* Страница, которая уходит влево */
-.page.to-left{
-z-index:3;
-transform:translateX(-500px) rotate(-12deg);
-}
-
-/* Страница, которая справа (следующая) */
-.page.next{
-z-index:4;
-transform:translateX(40px) rotate(3deg);
-}
-
-/* ---------------- МОДАЛКА ---------------- */
-
+/* Модалка просмотра */
 .modal{
 position:fixed;
 inset:0;
@@ -141,9 +115,7 @@ justify-content:center;
 z-index:1000;
 }
 
-.modal.open{
-display:flex;
-}
+.modal.open{display:flex;}
 
 .modal-content img,
 .modal-content video{
@@ -160,8 +132,7 @@ color:white;
 cursor:pointer;
 }
 
-/* ---------------- ФЛЕШКА ---------------- */
-
+/* USB */
 .usb{
 position:absolute;
 right:-60px;
@@ -213,6 +184,86 @@ cursor:pointer;
 box-shadow:0 6px 20px rgba(0,0,0,0.4);
 z-index:2000;
 }
+
+/* ---------------- USB ОКНО ---------------- */
+
+.usb-modal{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.85);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:2000;
+}
+
+.usb-modal.open{display:flex;}
+
+.usb-window{
+background:#f0f0f0;
+width:700px;
+height:500px;
+border-radius:12px;
+padding:20px;
+display:flex;
+flex-direction:column;
+box-shadow:0 0 40px rgba(0,0,0,0.6);
+}
+
+.usb-title{
+font-size:24px;
+margin-bottom:15px;
+font-weight:bold;
+}
+
+.usb-grid{
+flex:1;
+display:grid;
+grid-template-columns:repeat(auto-fill,120px);
+gap:12px;
+overflow-y:auto;
+padding-right:10px;
+}
+
+.usb-item{
+width:120px;
+height:120px;
+background:#fff;
+border-radius:8px;
+box-shadow:0 4px 12px rgba(0,0,0,0.3);
+overflow:hidden;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+}
+
+.usb-item img,
+.usb-item video{
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+.usb-add{
+margin-top:15px;
+padding:10px 20px;
+font-size:16px;
+background:#ffd27f;
+border:none;
+border-radius:8px;
+cursor:pointer;
+align-self:flex-start;
+}
+
+.usb-close{
+position:absolute;
+top:20px;
+right:30px;
+font-size:50px;
+color:white;
+cursor:pointer;
+}
 </style>
 </head>
 
@@ -220,6 +271,7 @@ z-index:2000;
 
 <button id="addBtn">Добавить файл</button>
 
+<!-- Папка -->
 <div class="container folder" id="folder">
 
 <div class="cover">
@@ -230,30 +282,18 @@ z-index:2000;
 <div class="pages-container">
 <div class="page-stack" id="stack">
 
-<div class="page active">
-<img src="https://picsum.photos/800/1200?1">
-</div>
-
-<div class="page">
-<img src="https://picsum.photos/800/1200?2">
-</div>
-
-<div class="page">
-<video src="https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4" muted loop></video>
-</div>
-
-<div class="page">
-<img src="https://picsum.photos/800/1200?3">
-</div>
+<div class="page active"><img src="https://picsum.photos/800/1200?1"></div>
+<div class="page"><img src="https://picsum.photos/800/1200?2"></div>
+<div class="page"><video src="https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4" muted loop></video></div>
+<div class="page"><img src="https://picsum.photos/800/1200?3"></div>
 
 </div>
 </div>
 
 </div>
 
-<div class="usb">
-<div class="usb-label">Видео с КПК</div>
-</div>
+<!-- USB -->
+<div class="usb"><div class="usb-label">Видео с КПК</div></div>
 
 <!-- Модалка просмотра -->
 <div class="modal" id="modal">
@@ -271,48 +311,45 @@ style="width:100%; padding:10px; font-size:16px; margin-bottom:20px;">
 </div>
 </div>
 
+<!-- USB окно -->
+<div class="usb-modal" id="usbModal">
+<div class="usb-close" id="usbClose">×</div>
+
+<div class="usb-window">
+<div class="usb-title">USB‑хранилище</div>
+
+<div class="usb-grid" id="usbGrid"></div>
+
+<button class="usb-add" id="usbAddBtn">Добавить файл</button>
+</div>
+</div>
+
 <script>
+/* ---------------- ПАПКА ---------------- */
+
 const folder = document.getElementById("folder");
 let pages = document.querySelectorAll(".page");
-const modal = document.getElementById("modal");
-const modalContent = document.getElementById("modalContent");
-const closeBtn = document.getElementById("close");
 const stack = document.getElementById("stack");
 
 let index = 0;
 
-/* ---------- обновление листов ---------- */
-
 function updatePages(){
 pages = document.querySelectorAll(".page");
-
 pages.forEach((p,i)=>{
 p.classList.remove("active","next","to-left");
-
-if(i === index){
-p.classList.add("active");
-}
-else if(i === index-1){
-p.classList.add("to-left");
-}
-else if(i === index+1){
-p.classList.add("next");
-}
+if(i===index) p.classList.add("active");
+else if(i===index-1) p.classList.add("to-left");
+else if(i===index+1) p.classList.add("next");
 });
 }
-
-/* ---------- открыть папку ---------- */
 
 folder.addEventListener("click",()=>{
 folder.classList.toggle("open");
-index = 0;
+index=0;
 updatePages();
 });
 
-/* ---------- стрелки ---------- */
-
 document.addEventListener("keydown",(e)=>{
-
 if(!folder.classList.contains("open")){
 if(e.key==="ArrowRight"){
 folder.classList.add("open");
@@ -320,120 +357,123 @@ updatePages();
 }
 return;
 }
-
-if(e.key==="ArrowRight"){
-if(index < pages.length-1){
-index++;
-updatePages();
-}
-}
-
+if(e.key==="ArrowRight" && index<pages.length-1){index++;updatePages();}
 if(e.key==="ArrowLeft"){
-if(index>0){
-index--;
-updatePages();
-}else{
-folder.classList.remove("open");
+if(index>0){index--;updatePages();}
+else folder.classList.remove("open");
 }
-}
-
 });
 
-/* ---------- полноэкран ---------- */
+/* ---------------- Просмотр ---------------- */
 
-stack.addEventListener("click",(e)=>{
-const page = e.target.closest(".page");
+const modal=document.getElementById("modal");
+const modalContent=document.getElementById("modalContent");
+document.getElementById("close").onclick=()=>{modal.classList.remove("open");modalContent.innerHTML="";};
+
+stack.onclick=(e)=>{
+const page=e.target.closest(".page");
 if(!page) return;
-
 modalContent.innerHTML="";
-
-const img = page.querySelector("img");
-const vid = page.querySelector("video");
-
-if(img){
-modalContent.appendChild(img.cloneNode());
-}
-if(vid){
-const v = vid.cloneNode(true);
-v.controls=true;
-v.autoplay=true;
-modalContent.appendChild(v);
-}
-
+const img=page.querySelector("img");
+const vid=page.querySelector("video");
+if(img) modalContent.appendChild(img.cloneNode());
+if(vid){let v=vid.cloneNode(true);v.controls=true;v.autoplay=true;modalContent.appendChild(v);}
 modal.classList.add("open");
-});
-
-/* ---------- закрыть ---------- */
-
-closeBtn.onclick=()=>{
-modal.classList.remove("open");
-modalContent.innerHTML="";
-}
-
-modal.onclick=(e)=>{
-if(e.target===modal){
-modal.classList.remove("open");
-modalContent.innerHTML="";
-}
-}
-
-/* ---------- ДОБАВЛЕНИЕ ФАЙЛОВ ---------- */
-
-const addBtn = document.getElementById("addBtn");
-const addModal = document.getElementById("addModal");
-const fileUrlInput = document.getElementById("fileUrl");
-const confirmAdd = document.getElementById("confirmAdd");
-
-/* открыть окно */
-addBtn.onclick = () => {
-addModal.style.display = "flex";
-fileUrlInput.placeholder = "Вставьте URL";
 };
 
-/* закрытие кликом вне окна */
-addModal.onclick = (e) => {
-if (e.target === addModal) addModal.style.display = "none";
-};
+modal.onclick=(e)=>{if(e.target===modal){modal.classList.remove("open");modalContent.innerHTML="";}};
 
-/* добавить файл */
-confirmAdd.onclick = () => {
-const url = fileUrlInput.value.trim();
-if (!url) return;
+/* ---------------- Добавление в папку ---------------- */
 
-let page = document.createElement("div");
-page.className = "page";
+const addBtn=document.getElementById("addBtn");
+const addModal=document.getElementById("addModal");
+const fileUrlInput=document.getElementById("fileUrl");
+const confirmAdd=document.getElementById("confirmAdd");
 
-if (url.match(/\.(mp4|webm|ogg)$/i)) {
-let v = document.createElement("video");
-v.src = url;
-v.loop = true;
-v.muted = true;
-page.appendChild(v);
-} else {
-let img = document.createElement("img");
-img.src = url;
-page.appendChild(img);
+addBtn.onclick=()=>{addModal.style.display="flex";fileUrlInput.placeholder="Вставьте URL";};
+addModal.onclick=(e)=>{if(e.target===addModal) addModal.style.display="none";};
+
+function createPage(url){
+let page=document.createElement("div");
+page.className="page";
+if(url.match(/\.(mp4|webm|ogg)$/i)){
+let v=document.createElement("video");v.src=url;v.loop=true;v.muted=true;page.appendChild(v);
+}else{
+let img=document.createElement("img");img.src=url;page.appendChild(img);
 }
-
 stack.appendChild(page);
-pages = document.querySelectorAll(".page");
 updatePages();
+}
 
-fileUrlInput.value = "";
-addModal.style.display = "none";
+confirmAdd.onclick=()=>{
+const url=fileUrlInput.value.trim();
+if(!url) return;
+createPage(url);
+saveToStorage(url);
+fileUrlInput.value="";
+addModal.style.display="none";
 };
 
-/* ---------- ФЛЕШКА ---------- */
+function saveToStorage(url){
+let saved=JSON.parse(localStorage.getItem("savedPages")||"[]");
+saved.push(url);
+localStorage.setItem("savedPages",JSON.stringify(saved));
+}
 
-const usb = document.querySelector(".usb");
+function loadSavedPages(){
+let saved=JSON.parse(localStorage.getItem("savedPages")||"[]");
+saved.forEach(url=>createPage(url));
+}
+loadSavedPages();
 
-usb.onclick = () => {
-addModal.style.display = "flex";
-fileUrlInput.placeholder = "Ссылка на видео с КПК";
+/* ---------------- USB‑ХРАНИЛИЩЕ ---------------- */
+
+const usb=document.querySelector(".usb");
+const usbModal=document.getElementById("usbModal");
+const usbGrid=document.getElementById("usbGrid");
+const usbClose=document.getElementById("usbClose");
+const usbAddBtn=document.getElementById("usbAddBtn");
+
+usb.onclick=()=>{usbModal.classList.add("open");renderUSB();};
+usbClose.onclick=()=>usbModal.classList.remove("open");
+
+function renderUSB(){
+usbGrid.innerHTML="";
+let files=JSON.parse(localStorage.getItem("usbFiles")||"[]");
+
+files.forEach(url=>{
+let item=document.createElement("div");
+item.className="usb-item";
+
+if(url.match(/\.(mp4|webm|ogg)$/i)){
+let v=document.createElement("video");v.src=url;item.appendChild(v);
+}else{
+let img=document.createElement("img");img.src=url;item.appendChild(img);
+}
+
+item.onclick=()=>{
+modalContent.innerHTML="";
+if(url.match(/\.(mp4|webm|ogg)$/i)){
+let v=document.createElement("video");v.src=url;v.controls=true;v.autoplay=true;modalContent.appendChild(v);
+}else{
+let img=document.createElement("img");img.src=url;modalContent.appendChild(img);
+}
+modal.classList.add("open");
+};
+
+usbGrid.appendChild(item);
+});
+}
+
+usbAddBtn.onclick=()=>{
+let url=prompt("Введите ссылку на файл:");
+if(!url) return;
+let files=JSON.parse(localStorage.getItem("usbFiles")||"[]");
+files.push(url);
+localStorage.setItem("usbFiles",JSON.stringify(files));
+renderUSB();
 };
 </script>
 
 </body>
 </html>
-
-
