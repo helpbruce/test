@@ -1,561 +1,85 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Папка Дела</title>
-
-<style>
-/* ---------------- БАЗОВЫЕ СТИЛИ ---------------- */
-
-*{margin:0;padding:0;box-sizing:border-box;}
-
-body{
-height:100vh;
-background:#1a1a1a;
-display:flex;
-justify-content:center;
-align-items:center;
-overflow:hidden;
-font-family:Arial;
-}
-
-/* Папка */
-.container{
-position:relative;
-width:440px;
-height:560px;
-perspective:2600px;
-cursor:pointer;
-}
-
-.cover{
-position:absolute;
-inset:0;
-background:linear-gradient(135deg,#f0e0c8,#d4b89c);
-border:6px solid #5c3a1a;
-border-radius:12px;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:32px;
-font-weight:bold;
-color:#2f1a0e;
-box-shadow:0 25px 70px rgba(0,0,0,0.6);
-transform-origin:left;
-transition:transform 1.6s ease;
-z-index:10;
-}
-
-.folder.open .cover{transform:rotateY(-180deg);}
-
-.cover-back{
-position:absolute;
-inset:0;
-background:linear-gradient(135deg,#e8d9c0,#d0b89a);
-border-radius:12px;
-transform:rotateY(180deg);
-}
-
-.pages-container{
-position:absolute;
-inset:0;
-background:#f6f6f6;
-border:6px solid #5c3a1a;
-border-radius:12px;
-overflow:hidden;
-box-shadow:inset 0 0 40px rgba(0,0,0,0.4);
-pointer-events:none;
-}
-
-.folder.open .pages-container{pointer-events:auto;}
-
-.page-stack{
-width:100%;
-height:100%;
-display:flex;
-align-items:center;
-justify-content:center;
-position:relative;
-}
-
-.page{
-position:absolute;
-width:82%;
-height:86%;
-background:white;
-border-radius:6px;
-box-shadow:0 10px 35px rgba(0,0,0,0.4);
-display:flex;
-align-items:center;
-justify-content:center;
-overflow:hidden;
-transition:transform 0.65s cubic-bezier(0.25,0.8,0.25,1);
-}
-
-.page img,
-.page video{
-width:100%;
-height:100%;
-object-fit:contain;
-}
-
-.page.active{z-index:5;transform:translateX(0) scale(1);}
-.page.to-left{z-index:3;transform:translateX(-500px) rotate(-12deg);}
-.page.next{z-index:4;transform:translateX(40px) rotate(3deg);}
-
-/* Модалка просмотра */
-.modal{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,0.95);
-display:none;
-align-items:center;
-justify-content:center;
-z-index:3000; /* ПОВЕРХ ВСЕГО */
-}
-
-.modal.open{display:flex;}
-
-.modal-content img,
-.modal-content video{
-max-width:96vw;
-max-height:96vh;
-}
-
-.close{
-position:absolute;
-top:20px;
-right:30px;
-font-size:60px;
-color:white;
-cursor:pointer;
-}
-
-/* USB */
-.usb{
-position:absolute;
-right:-60px;
-top:50%;
-transform:translateY(-50%);
-width:120px;
-height:240px;
-background:linear-gradient(135deg,#333,#111);
-border-radius:12px 12px 24px 24px;
-border:4px solid #555;
-box-shadow:0 15px 40px rgba(0,0,0,0.7);
-cursor:pointer;
-}
-
-.usb::before{
-content:"";
-position:absolute;
-top:-20px;
-left:50%;
-transform:translateX(-50%);
-width:60px;
-height:20px;
-background:#666;
-border-radius:8px 8px 0 0;
-}
-
-.usb-label{
-position:absolute;
-bottom:18px;
-left:50%;
-transform:translateX(-50%);
-color:#0f0;
-font-weight:bold;
-text-shadow:0 0 5px #0f0;
-}
-
-/* Кнопка добавления */
-#addBtn{
-position:fixed;
-bottom:30px;
-left:30px;
-padding:14px 22px;
-font-size:18px;
-border:none;
-border-radius:8px;
-background:#ffcc66;
-color:#3a250f;
-cursor:pointer;
-box-shadow:0 6px 20px rgba(0,0,0,0.4);
-z-index:100; /* ТЕПЕРЬ ПОД ОКНАМИ */
-}
-
-/* ---------------- USB ОКНО ---------------- */
-
-.usb-modal{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,0.85);
-display:none;
-align-items:center;
-justify-content:center;
-z-index:2000;
-}
-
-.usb-modal.open{display:flex;}
-
-.usb-window{
-background:#f0f0f0;
-width:700px;
-height:500px;
-border-radius:12px;
-padding:20px;
-display:flex;
-flex-direction:column;
-box-shadow:0 0 40px rgba(0,0,0,0.6);
-}
-
-.usb-title{
-font-size:24px;
-margin-bottom:15px;
-font-weight:bold;
-}
-
-.usb-grid{
-flex:1;
-display:grid;
-grid-template-columns:repeat(auto-fill,120px);
-gap:12px;
-overflow-y:auto;
-padding-right:10px;
-}
-
-.usb-item{
-width:120px;
-height:120px;
-background:#fff;
-border-radius:8px;
-box-shadow:0 4px 12px rgba(0,0,0,0.3);
-overflow:hidden;
-display:flex;
-align-items:center;
-justify-content:center;
-cursor:pointer;
-}
-
-.usb-item img,
-.usb-item video{
-width:100%;
-height:100%;
-object-fit:cover;
-}
-
-.usb-add{
-margin-top:15px;
-padding:10px 20px;
-font-size:16px;
-background:#ffd27f;
-border:none;
-border-radius:8px;
-cursor:pointer;
-align-self:flex-start;
-}
-
-.usb-close{
-position:absolute;
-top:20px;
-right:30px;
-font-size:50px;
-color:white;
-cursor:pointer;
-}
-
-/* Кнопка уничтожить */
-#deleteBtn{
-position:fixed;
-bottom:40px;
-left:50%;
-transform:translateX(-50%);
-padding:12px 22px;
-font-size:18px;
-background:#ff4444;
-color:white;
-border:none;
-border-radius:8px;
-cursor:pointer;
-display:none;
-z-index:4000;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>Папка Дела + USB</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-
 <body>
 
-<button id="addBtn">Добавить файл</button>
+  <!-- Кнопка добавления файла (для папки) -->
+  <button id="addBtnFolder">Добавить файл</button>
 
-<!-- Папка -->
-<div class="container folder" id="folder">
+  <!-- Основная папка -->
+  <div class="container folder" id="folder">
+    <div class="cover">
+      Папка "Дела"
+      <div class="cover-back"></div>
+    </div>
 
-<div class="cover">
-Папка "Дела"
-<div class="cover-back"></div>
-</div>
+    <div class="pages-container">
+      <div class="page-stack" id="stack">
+        <!-- Изначально пусто, страницы будут добавляться из JS -->
+      </div>
+    </div>
+  </div>
 
-<div class="pages-container">
-<div class="page-stack" id="stack">
+  <!-- USB-устройство сбоку -->
+  <div class="usb" id="usbIcon">
+    <div class="usb-label">USB</div>
+  </div>
 
-<div class="page active"><img src="https://picsum.photos/800/1200?1"></div>
-<div class="page"><img src="https://picsum.photos/800/1200?2"></div>
-<div class="page"><video src="https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4" muted loop></video></div>
-<div class="page"><img src="https://picsum.photos/800/1200?3"></div>
+  <!-- Окно USB-хранилища -->
+  <div class="usb-modal" id="usbModal">
+    <div class="usb-close" id="usbClose">×</div>
 
-</div>
-</div>
+    <div class="usb-window">
+      <div class="usb-title">USB‑хранилище</div>
 
-</div>
+      <div class="usb-grid" id="usbGrid">
+        <!-- Элементы USB-файлов будут добавляться из JS -->
+      </div>
 
-<!-- USB -->
-<div class="usb"><div class="usb-label">Видео с КПК</div></div>
+      <button class="usb-add" id="addBtnUsb">Добавить файл</button>
+    </div>
+  </div>
 
-<!-- Модалка просмотра -->
-<div class="modal" id="modal">
-<div class="close" id="close">×</div>
-<div class="modal-content" id="modalContent"></div>
-</div>
+  <!-- Универсальная модалка добавления файла (одинаковая визуально для папки и USB) -->
+  <div class="modal" id="addModal">
+    <div class="add-modal-inner">
+      <h2>Добавить файл</h2>
 
-<button id="deleteBtn">Уничтожить</button>
+      <input id="fileUrl" type="text" placeholder="Вставьте URL файла">
 
-<!-- Модалка добавления -->
-<div class="modal" id="addModal">
-<div style="background:#fff; padding:30px; border-radius:12px; width:360px; text-align:center;">
-<h2 style="margin-bottom:20px;">Добавить ссылку</h2>
-<input id="fileUrl" type="text" placeholder="Вставьте URL"
-style="width:100%; padding:10px; font-size:16px; margin-bottom:20px;">
-<button id="confirmAdd" style="padding:10px 20px; font-size:16px;">Добавить</button>
-</div>
-</div>
+      <!-- Скрытое поле/атрибут: откуда вызвано (folder / usb) -->
+      <input id="addContext" type="hidden" value="folder">
 
-<!-- USB окно -->
-<div class="usb-modal" id="usbModal">
-<div class="usb-close" id="usbClose">×</div>
+      <button id="confirmAdd">Добавить</button>
+    </div>
+  </div>
 
-<div class="usb-window">
-<div class="usb-title">USB‑хранилище</div>
+  <!-- Полноэкранный просмотр -->
+  <div class="modal" id="viewerModal">
+    <div class="viewer-close" id="viewerClose">×</div>
 
-<div class="usb-grid" id="usbGrid"></div>
+    <!-- Стрелки по краям (полупрозрачные) -->
+    <div class="viewer-arrow viewer-arrow-left" id="viewerPrev">‹</div>
+    <div class="viewer-arrow viewer-arrow-right" id="viewerNext">›</div>
 
-<button class="usb-add" id="usbAddBtn">Добавить файл</button>
-</div>
-</div>
+    <!-- Кликабельные зоны слева/справа (для листания, не по документу) -->
+    <div class="viewer-zone viewer-zone-left" id="viewerZoneLeft"></div>
+    <div class="viewer-zone viewer-zone-right" id="viewerZoneRight"></div>
 
-<script>
-/* ---------------- ПАПКА ---------------- */
+    <!-- Контент (картинка/видео) -->
+    <div class="viewer-content" id="viewerContent"></div>
 
-const folder = document.getElementById("folder");
-let pages = document.querySelectorAll(".page");
-const stack = document.getElementById("stack");
+    <!-- Кнопка уничтожить -->
+    <button id="deleteBtn">Уничтожить</button>
+  </div>
 
-let index = 0;
-
-function updatePages(){
-pages = document.querySelectorAll(".page");
-pages.forEach((p,i)=>{
-p.classList.remove("active","next","to-left");
-if(i===index) p.classList.add("active");
-else if(i===index-1) p.classList.add("to-left");
-else if(i===index+1) p.classList.add("next");
-});
-}
-
-folder.addEventListener("click",()=>{
-folder.classList.toggle("open");
-index=0;
-updatePages();
-});
-
-/* ---------------- Исправление: документы открываются ---------------- */
-
-stack.onclick = (e)=>{
-e.stopPropagation(); /* ← ВАЖНО! Папка не закрывается */
-
-const page = e.target.closest(".page");
-if(!page) return;
-
-const img = page.querySelector("img");
-const vid = page.querySelector("video");
-
-if (img) openFullscreen(img.src, "folder");
-if (vid) openFullscreen(vid.src, "folder");
-};
-
-/* ---------------- Стрелки ---------------- */
-
-document.addEventListener("keydown",(e)=>{
-if(!folder.classList.contains("open")){
-if(e.key==="ArrowRight"){
-folder.classList.add("open");
-updatePages();
-}
-return;
-}
-if(e.key==="ArrowRight" && index<pages.length-1){index++;updatePages();}
-if(e.key==="ArrowLeft"){
-if(index>0){index--;updatePages();}
-else folder.classList.remove("open");
-}
-});
-
-/* ---------------- Просмотр ---------------- */
-
-const modal=document.getElementById("modal");
-const modalContent=document.getElementById("modalContent");
-const deleteBtn=document.getElementById("deleteBtn");
-
-document.getElementById("close").onclick=closeModal;
-
-function closeModal(){
-modal.classList.remove("open");
-modalContent.innerHTML="";
-deleteBtn.style.display="none";
-currentOpenedFile=null;
-currentOpenedSource=null;
-}
-
-modal.onclick=(e)=>{if(e.target===modal) closeModal();};
-
-/* ---------------- Добавление в папку ---------------- */
-
-const addBtn=document.getElementById("addBtn");
-const addModal=document.getElementById("addModal");
-const fileUrlInput=document.getElementById("fileUrl");
-const confirmAdd=document.getElementById("confirmAdd");
-
-addBtn.onclick=()=>{addModal.style.display="flex";fileUrlInput.placeholder="Вставьте URL";};
-addModal.onclick=(e)=>{if(e.target===addModal) addModal.style.display="none";};
-
-function createPage(url){
-let page=document.createElement("div");
-page.className="page";
-if(url.match(/\.(mp4|webm|ogg)$/i)){
-let v=document.createElement("video");v.src=url;v.loop=true;v.muted=true;page.appendChild(v);
-}else{
-let img=document.createElement("img");img.src=url;page.appendChild(img);
-}
-stack.appendChild(page);
-updatePages();
-}
-
-confirmAdd.onclick=()=>{
-const url=fileUrlInput.value.trim();
-if(!url) return;
-createPage(url);
-saveToStorage(url);
-fileUrlInput.value="";
-addModal.style.display="none";
-};
-
-function saveToStorage(url){
-let saved=JSON.parse(localStorage.getItem("savedPages")||"[]");
-saved.push(url);
-localStorage.setItem("savedPages",JSON.stringify(saved));
-}
-
-function loadSavedPages(){
-let saved=JSON.parse(localStorage.getItem("savedPages")||"[]");
-saved.forEach(url=>createPage(url));
-}
-loadSavedPages();
-
-/* ---------------- USB‑ХРАНИЛИЩЕ ---------------- */
-
-const usb=document.querySelector(".usb");
-const usbModal=document.getElementById("usbModal");
-const usbGrid=document.getElementById("usbGrid");
-const usbClose=document.getElementById("usbClose");
-const usbAddBtn=document.getElementById("usbAddBtn");
-
-usb.onclick=()=>{usbModal.classList.add("open");renderUSB();};
-usbClose.onclick=()=>usbModal.classList.remove("open");
-
-function renderUSB(){
-usbGrid.innerHTML="";
-let files=JSON.parse(localStorage.getItem("usbFiles")||"[]");
-
-files.forEach(url=>{
-let item=document.createElement("div");
-item.className="usb-item";
-
-if(url.match(/\.(mp4|webm|ogg)$/i)){
-let v=document.createElement("video");v.src=url;item.appendChild(v);
-}else{
-let img=document.createElement("img");img.src=url;item.appendChild(img);
-}
-
-item.onclick=()=>openFullscreen(url,"usb");
-
-usbGrid.appendChild(item);
-});
-}
-
-usbAddBtn.onclick=()=>{
-let url=prompt("Введите ссылку на файл:");
-if(!url) return;
-let files=JSON.parse(localStorage.getItem("usbFiles")||"[]");
-files.push(url);
-localStorage.setItem("usbFiles",JSON.stringify(files));
-renderUSB();
-};
-
-/* ---------------- Полноэкран + Уничтожить ---------------- */
-
-let currentOpenedFile=null;
-let currentOpenedSource=null;
-
-function openFullscreen(url,source){
-modalContent.innerHTML="";
-
-if(url.match(/\.(mp4|webm|ogg)$/i)){
-let v=document.createElement("video");
-v.src=url;
-v.controls=true;
-v.autoplay=true;
-modalContent.appendChild(v);
-}else{
-let img=document.createElement("img");
-img.src=url;
-modalContent.appendChild(img);
-}
-
-currentOpenedFile=url;
-currentOpenedSource=source;
-
-deleteBtn.style.display="block";
-modal.classList.add("open");
-}
-
-deleteBtn.onclick=()=>{
-if(!currentOpenedFile) return;
-
-if(currentOpenedSource==="folder"){
-let saved=JSON.parse(localStorage.getItem("savedPages")||"[]");
-saved=saved.filter(f=>f!==currentOpenedFile);
-localStorage.setItem("savedPages",JSON.stringify(saved));
-location.reload();
-}
-
-if(currentOpenedSource==="usb"){
-let saved=JSON.parse(localStorage.getItem("usbFiles")||"[]");
-saved=saved.filter(f=>f!==currentOpenedFile);
-localStorage.setItem("usbFiles",JSON.stringify(saved));
-renderUSB();
-closeModal();
-}
-};
-
-/* ---------------- ESC закрывает всё ---------------- */
-
-document.addEventListener("keydown",(e)=>{
-if(e.key==="Escape"){
-closeModal();
-usbModal.classList.remove("open");
-}
-});
-</script>
-
+  <!-- Здесь позже подключим JS -->
+  <script>
+    // Часть 3 и 4 будем добавлять сюда
+  </script>
 </body>
 </html>
