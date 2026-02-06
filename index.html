@@ -7,238 +7,246 @@
 
 <style>
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-body{
-height:100vh;
-background:#1a1a1a;
-display:flex;
-justify-content:center;
-align-items:center;
-overflow:hidden;
-font-family:Arial;
+body {
+  height: 100vh;
+  background: #1a1a1a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  font-family: Arial;
 }
 
 /* ---------------- ПАПКА ---------------- */
 
-.container{
-position:relative;
-width:440px;
-height:560px;
-perspective:2600px;
-cursor:pointer;
+.container {
+  position: relative;
+  width: 440px;
+  height: 560px;
+  perspective: 2600px;
+  cursor: pointer;
 }
 
-.cover{
-position:absolute;
-inset:0;
-background:linear-gradient(135deg,#f0e0c8,#d4b89c);
-border:6px solid #5c3a1a;
-border-radius:12px;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:32px;
-font-weight:bold;
-color:#2f1a0e;
-box-shadow:0 25px 70px rgba(0,0,0,0.6);
-transform-origin:left;
-transition:transform 1.6s ease;
-z-index:10;
+.cover {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #f0e0c8, #d4b89c);
+  border: 6px solid #5c3a1a;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: bold;
+  color: #2f1a0e;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.6);
+  transform-origin: left;
+  transition: transform 1.6s ease;
+  z-index: 10;
 }
 
-.folder.open .cover{
-transform:rotateY(-180deg);
+.folder.open .cover {
+  transform: rotateY(-180deg);
 }
 
-.cover-back{
-position:absolute;
-inset:0;
-background:linear-gradient(135deg,#e8d9c0,#d0b89a);
-border-radius:12px;
-transform:rotateY(180deg);
+.cover-back {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #e8d9c0, #d0b89a);
+  border-radius: 12px;
+  transform: rotateY(180deg);
 }
 
 /* ---------------- ВНУТРЕННОСТЬ ---------------- */
 
-.pages-container{
-position:absolute;
-inset:0;
-background:#f6f6f6;
-border:6px solid #5c3a1a;
-border-radius:12px;
-overflow:hidden;
-box-shadow:inset 0 0 40px rgba(0,0,0,0.4);
-pointer-events:none;
+.pages-container {
+  position: absolute;
+  inset: 0;
+  background: #f6f6f6;
+  border: 6px solid #5c3a1a;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
 }
 
-.folder.open .pages-container{
-pointer-events:auto;
+.folder.open .pages-container {
+  pointer-events: auto;
 }
 
-.page-stack{
-width:100%;
-height:100%;
-display:flex;
-align-items:center;
-justify-content:center;
-position:relative;
+.page-stack {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 /* ---------------- ЛИСТЫ ---------------- */
 
-.page{
-position:absolute;
-width:82%;
-height:86%;
-background:white;
-border-radius:6px;
-box-shadow:0 10px 35px rgba(0,0,0,0.4);
-display:flex;
-align-items:center;
-justify-content:center;
-overflow:hidden;
-transition:transform 0.65s cubic-bezier(0.25,0.8,0.25,1);
+.page {
+  position: absolute;
+  width: 82%;
+  height: 86%;
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: transform 0.65s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .page img,
-.page video{
-width:100%;
-height:100%;
-object-fit:contain;
+.page video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 /* Центр страницы */
-.page.active{
-z-index:5;
-transform:translateX(0) scale(1);
+.page.active {
+  z-index: 5;
+  transform: translateX(0) scale(1);
 }
 
 /* Страница, которая уходит влево */
-.page.to-left{
-z-index:3;
-transform:translateX(-500px) rotate(-12deg); /* Сильно сдвигаем влево */
+.page.to-left {
+  z-index: 3;
+  transform: translateX(-500px) rotate(-12deg); /* Сильно сдвигаем влево */
 }
 
 /* Страница, которая справа (следующая) */
-.page.next{
-z-index:4;
-transform:translateX(40px) rotate(3deg);
+.page.next {
+  z-index: 4;
+  transform: translateX(40px) rotate(3deg);
 }
 
 /* ---------------- МОДАЛКА ---------------- */
 
-.modal{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,0.95);
-display:none;
-align-items:center;
-justify-content:center;
-z-index:1000;
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
 }
 
-.modal.open{
-display:flex;
+.modal.open {
+  display: flex;
 }
 
 .modal-content img,
-.modal-content video{
-max-width:96vw;
-max-height:96vh;
+.modal-content video {
+  max-width: 96vw;
+  max-height: 96vh;
 }
 
-.close{
-position:absolute;
-top:20px;
-right:30px;
-font-size:60px;
-color:white;
-cursor:pointer;
+.close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 60px;
+  color: white;
+  cursor: pointer;
 }
 
-/* ---------------- ФЛЕШКА ---------------- */
+/* ---------------- КНОПКА ДОБАВЛЕНИЯ ДОКУМЕНТА ---------------- */
 
-.usb{
-position:absolute;
-right:-60px;
-top:50%;
-transform:translateY(-50%);
-width:120px;
-height:240px;
-background:linear-gradient(135deg,#333,#111);
-border-radius:12px 12px 24px 24px;
-border:4px solid #555;
-box-shadow:0 15px 40px rgba(0,0,0,0.7);
+#addDocBtn {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 15;
 }
 
-.usb::before{
-content:"";
-position:absolute;
-top:-20px;
-left:50%;
-transform:translateX(-50%);
-width:60px;
-height:20px;
-background:#666;
-border-radius:8px 8px 0 0;
+#urlInput {
+  display: none;
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  width: 80%;
 }
 
-.usb-label{
-position:absolute;
-bottom:18px;
-left:50%;
-transform:translateX(-50%);
-color:#0f0;
-font-weight:bold;
-text-shadow:0 0 5px #0f0;
+#urlSubmit {
+  display: none;
+  position: absolute;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 16px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 </style>
+
 </head>
 
 <body>
 
 <div class="container folder" id="folder">
 
-<div class="cover">
-Папка "Дела"
-<div class="cover-back"></div>
+  <div class="cover">
+    Папка "Дела"
+    <div class="cover-back"></div>
+  </div>
+
+  <div class="pages-container">
+    <div class="page-stack" id="stack">
+
+      <div class="page active">
+        <img src="https://picsum.photos/800/1200?1">
+      </div>
+
+      <div class="page">
+        <img src="https://picsum.photos/800/1200?2">
+      </div>
+
+      <div class="page">
+        <video src="https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4" muted loop></video>
+      </div>
+
+      <div class="page">
+        <img src="https://picsum.photos/800/1200?3">
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
-<div class="pages-container">
-<div class="page-stack" id="stack">
-
-<div class="page active">
-<img src="https://picsum.photos/800/1200?1">
-</div>
-
-<div class="page">
-<img src="https://picsum.photos/800/1200?2">
-</div>
-
-<div class="page">
-<video src="https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4" muted loop></video>
-</div>
-
-<div class="page">
-<img src="https://picsum.photos/800/1200?3">
-</div>
-
-</div>
-</div>
-
-</div>
-
-<div class="usb">
-<div class="usb-label">Видео с КПК</div>
-</div>
+<!-- Кнопка для добавления документа -->
+<button id="addDocBtn">Добавить документ</button>
+<input type="text" id="urlInput" placeholder="Вставьте ссылку на PDF">
+<button id="urlSubmit">Добавить</button>
 
 <div class="modal" id="modal">
-<div class="close" id="close">×</div>
-<div class="modal-content" id="modalContent"></div>
+  <div class="close" id="close">×</div>
+  <div class="modal-content" id="modalContent"></div>
 </div>
 
 <script>
@@ -247,104 +255,67 @@ const pages = document.querySelectorAll(".page");
 const modal = document.getElementById("modal");
 const modalContent = document.getElementById("modalContent");
 const closeBtn = document.getElementById("close");
+const addDocBtn = document.getElementById("addDocBtn");
+const urlInput = document.getElementById("urlInput");
+const urlSubmit = document.getElementById("urlSubmit");
+const stack = document.getElementById('stack');
 
 let index = 0;
 
 /* ---------- обновление листов ---------- */
 
-function updatePages(){
-pages.forEach((p,i)=>{
-p.classList.remove("active","next","to-left");
+function updatePages() {
+  pages.forEach((p, i) => {
+    p.classList.remove("active", "next", "to-left");
 
-if(i === index){
-p.classList.add("active");
-}
-else if(i === index-1){
-p.classList.add("to-left");
-}
-else if(i === index+1){
-p.classList.add("next");
-}
-});
+    if (i === index) {
+      p.classList.add("active");
+    } else if (i === index - 1) {
+      p.classList.add("to-left");
+    } else if (i === index + 1) {
+      p.classList.add("next");
+    }
+  });
 }
 
 /* ---------- открыть папку ---------- */
 
-folder.addEventListener("click",()=>{
-folder.classList.toggle("open");
-index = 0;
-updatePages();
+folder.addEventListener("click", () => {
+  folder.classList.toggle("open");
+  index = 0;
+  updatePages();
 });
 
 /* ---------- стрелки ---------- */
 
-document.addEventListener("keydown",(e)=>{
+document.addEventListener("keydown", (e) => {
+  if (!folder.classList.contains("open")) {
+    if (e.key === "ArrowRight") {
+      folder.classList.add("open");
+      updatePages();
+    }
+    return;
+  }
 
-if(!folder.classList.contains("open")){
-if(e.key==="ArrowRight"){
-folder.classList.add("open");
-updatePages();
-}
-return;
-}
+  if (e.key === "ArrowRight") {
+    if (index < pages.length - 1) {
+      index++;
+      updatePages();
+    }
+  }
 
-if(e.key==="ArrowRight"){
-if(index < pages.length-1){
-index++;
-updatePages();
-}
-}
-
-if(e.key==="ArrowLeft"){
-if(index>0){
-index--;
-updatePages();
-}else{
-folder.classList.remove("open");
-}
-}
-
+  if (e.key === "ArrowLeft") {
+    if (index > 0) {
+      index--;
+      updatePages();
+    } else {
+      folder.classList.remove("open");
+    }
+  }
 });
 
 /* ---------- полноэкран ---------- */
 
-document.getElementById("stack").addEventListener("click",(e)=>{
-const page = e.target.closest(".page");
-if(!page) return;
+document.getElementById("stack").addEventListener("click", (e) => {
+  const page =
 
-modalContent.innerHTML="";
-
-const img = page.querySelector("img");
-const vid = page.querySelector("video");
-
-if(img){
-modalContent.appendChild(img.cloneNode());
-}
-if(vid){
-const v = vid.cloneNode(true);
-v.controls=true;
-v.autoplay=true;
-modalContent.appendChild(v);
-}
-
-modal.classList.add("open");
-});
-
-/* ---------- закрыть ---------- */
-
-closeBtn.onclick=()=>{
-modal.classList.remove("open");
-modalContent.innerHTML="";
-}
-
-modal.onclick=(e)=>{
-if(e.target===modal){
-modal.classList.remove("open");
-modalContent.innerHTML="";
-}
-}
-
-</script>
-
-</body>
-</html>
