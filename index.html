@@ -6,7 +6,7 @@
 <title>Папка Дела</title>
 
 <style>
-/* ---------------- БАЗОВЫЕ СТИЛИ (как у тебя) ---------------- */
+/* ---------------- БАЗОВЫЕ СТИЛИ ---------------- */
 
 *{margin:0;padding:0;box-sizing:border-box;}
 
@@ -112,7 +112,7 @@ background:rgba(0,0,0,0.95);
 display:none;
 align-items:center;
 justify-content:center;
-z-index:1000;
+z-index:3000; /* ПОВЕРХ ВСЕГО */
 }
 
 .modal.open{display:flex;}
@@ -182,7 +182,7 @@ background:#ffcc66;
 color:#3a250f;
 cursor:pointer;
 box-shadow:0 6px 20px rgba(0,0,0,0.4);
-z-index:2000;
+z-index:100; /* ТЕПЕРЬ ПОД ОКНАМИ */
 }
 
 /* ---------------- USB ОКНО ---------------- */
@@ -264,6 +264,23 @@ font-size:50px;
 color:white;
 cursor:pointer;
 }
+
+/* Кнопка уничтожить */
+#deleteBtn{
+position:fixed;
+bottom:40px;
+left:50%;
+transform:translateX(-50%);
+padding:12px 22px;
+font-size:18px;
+background:#ff4444;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+display:none;
+z-index:4000;
+}
 </style>
 </head>
 
@@ -300,6 +317,8 @@ cursor:pointer;
 <div class="close" id="close">×</div>
 <div class="modal-content" id="modalContent"></div>
 </div>
+
+<button id="deleteBtn">Уничтожить</button>
 
 <!-- Модалка добавления -->
 <div class="modal" id="addModal">
@@ -368,20 +387,19 @@ else folder.classList.remove("open");
 
 const modal=document.getElementById("modal");
 const modalContent=document.getElementById("modalContent");
-document.getElementById("close").onclick=()=>{modal.classList.remove("open");modalContent.innerHTML="";};
+const deleteBtn=document.getElementById("deleteBtn");
 
-stack.onclick=(e)=>{
-const page=e.target.closest(".page");
-if(!page) return;
+document.getElementById("close").onclick=closeModal;
+
+function closeModal(){
+modal.classList.remove("open");
 modalContent.innerHTML="";
-const img=page.querySelector("img");
-const vid=page.querySelector("video");
-if(img) modalContent.appendChild(img.cloneNode());
-if(vid){let v=vid.cloneNode(true);v.controls=true;v.autoplay=true;modalContent.appendChild(v);}
-modal.classList.add("open");
-};
+deleteBtn.style.display="none";
+currentOpenedFile=null;
+currentOpenedSource=null;
+}
 
-modal.onclick=(e)=>{if(e.target===modal){modal.classList.remove("open");modalContent.innerHTML="";}};
+modal.onclick=(e)=>{if(e.target===modal) closeModal();};
 
 /* ---------------- Добавление в папку ---------------- */
 
@@ -451,15 +469,7 @@ let v=document.createElement("video");v.src=url;item.appendChild(v);
 let img=document.createElement("img");img.src=url;item.appendChild(img);
 }
 
-item.onclick=()=>{
-modalContent.innerHTML="";
-if(url.match(/\.(mp4|webm|ogg)$/i)){
-let v=document.createElement("video");v.src=url;v.controls=true;v.autoplay=true;modalContent.appendChild(v);
-}else{
-let img=document.createElement("img");img.src=url;modalContent.appendChild(img);
-}
-modal.classList.add("open");
-};
+item.onclick=()=>openFullscreen(url,"usb");
 
 usbGrid.appendChild(item);
 });
@@ -473,6 +483,61 @@ files.push(url);
 localStorage.setItem("usbFiles",JSON.stringify(files));
 renderUSB();
 };
+
+/* ---------------- Полноэкран + Уничтожить ---------------- */
+
+let currentOpenedFile=null;
+let currentOpenedSource=null;
+
+function openFullscreen(url,source){
+modalContent.innerHTML="";
+
+if(url.match(/\.(mp4|webm|ogg)$/i)){
+let v=document.createElement("video");
+v.src=url;
+v.controls=true;
+v.autoplay=true;
+modalContent.appendChild(v);
+}else{
+let img=document.createElement("img");
+img.src=url;
+modalContent.appendChild(img);
+}
+
+currentOpenedFile=url;
+currentOpenedSource=source;
+
+deleteBtn.style.display="block";
+modal.classList.add("open");
+}
+
+deleteBtn.onclick=()=>{
+if(!currentOpenedFile) return;
+
+if(currentOpenedSource==="folder"){
+let saved=JSON.parse(localStorage.getItem("savedPages")||"[]");
+saved=saved.filter(f=>f!==currentOpenedFile);
+localStorage.setItem("savedPages",JSON.stringify(saved));
+location.reload();
+}
+
+if(currentOpenedSource==="usb"){
+let saved=JSON.parse(localStorage.getItem("usbFiles")||"[]");
+saved=saved.filter(f=>f!==currentOpenedFile);
+localStorage.setItem("usbFiles",JSON.stringify(saved));
+renderUSB();
+closeModal();
+}
+};
+
+/* ---------------- ESC закрывает всё ---------------- */
+
+document.addEventListener("keydown",(e)=>{
+if(e.key==="Escape"){
+closeModal();
+usbModal.classList.remove("open");
+}
+});
 </script>
 
 </body>
