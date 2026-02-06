@@ -368,6 +368,23 @@ index=0;
 updatePages();
 });
 
+/* ---------------- Исправление: документы открываются ---------------- */
+
+stack.onclick = (e)=>{
+e.stopPropagation(); /* ← ВАЖНО! Папка не закрывается */
+
+const page = e.target.closest(".page");
+if(!page) return;
+
+const img = page.querySelector("img");
+const vid = page.querySelector("video");
+
+if (img) openFullscreen(img.src, "folder");
+if (vid) openFullscreen(vid.src, "folder");
+};
+
+/* ---------------- Стрелки ---------------- */
+
 document.addEventListener("keydown",(e)=>{
 if(!folder.classList.contains("open")){
 if(e.key==="ArrowRight"){
