@@ -1,33 +1,38 @@
 <!DOCTYPE html>
-<link rel="stylesheet" href="style.css">
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Папка Дела + USB</title>
+  <title>Папка "Дела" + USB</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <!-- Кнопка добавления файла (для папки) -->
   <button id="addBtnFolder">Добавить файл</button>
 
-  <!-- Основная папка -->
-  <div class="container folder" id="folder">
-    <div class="cover">
-      Папка "Дела"
-      <div class="cover-back"></div>
-    </div>
+  <!-- Обёртка экрана (для анимации с USB) -->
+  <div id="screenWrapper">
 
-    <div class="pages-container">
-      <div class="page-stack" id="stack">
-        <!-- Изначально пусто, страницы будут добавляться из JS -->
+    <!-- Основная папка -->
+    <div class="container folder" id="folder">
+      <div class="cover">
+        Папка "Дела"
+        <div class="cover-back"></div>
+      </div>
+
+      <div class="pages-container">
+        <div class="page-stack" id="stack">
+          <!-- Страницы добавляются из JS -->
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- USB-устройство сбоку -->
-  <div class="usb" id="usbIcon">
-    <div class="usb-label">USB</div>
+    <!-- USB-устройство сбоку -->
+    <div class="usb" id="usbIcon">
+      <div class="usb-label">USB</div>
+    </div>
+
   </div>
 
   <!-- Окно USB-хранилища -->
@@ -38,23 +43,19 @@
       <div class="usb-title">USB‑хранилище</div>
 
       <div class="usb-grid" id="usbGrid">
-        <!-- Элементы USB-файлов будут добавляться из JS -->
+        <!-- Элементы USB-файлов добавляются из JS -->
       </div>
 
       <button class="usb-add" id="addBtnUsb">Добавить файл</button>
     </div>
   </div>
 
-  <!-- Универсальная модалка добавления файла (одинаковая визуально для папки и USB) -->
+  <!-- Универсальная модалка добавления файла -->
   <div class="modal" id="addModal">
     <div class="add-modal-inner">
       <h2>Добавить файл</h2>
-
       <input id="fileUrl" type="text" placeholder="Вставьте URL файла">
-
-      <!-- Скрытое поле/атрибут: откуда вызвано (folder / usb) -->
       <input id="addContext" type="hidden" value="folder">
-
       <button id="confirmAdd">Добавить</button>
     </div>
   </div>
@@ -67,19 +68,17 @@
     <div class="viewer-arrow viewer-arrow-left" id="viewerPrev">‹</div>
     <div class="viewer-arrow viewer-arrow-right" id="viewerNext">›</div>
 
-    <!-- Кликабельные зоны слева/справа (для листания, не по документу) -->
+    <!-- Кликабельные зоны слева/справа -->
     <div class="viewer-zone viewer-zone-left" id="viewerZoneLeft"></div>
     <div class="viewer-zone viewer-zone-right" id="viewerZoneRight"></div>
 
-    <!-- Контент (картинка/видео) -->
+    <!-- Контент (картинка/видео/YouTube) -->
     <div class="viewer-content" id="viewerContent"></div>
 
     <!-- Кнопка уничтожить -->
     <button id="deleteBtn">Уничтожить</button>
   </div>
 
-  <!-- Здесь позже подключим JS -->
   <script src="script.js"></script>
 </body>
 </html>
-
