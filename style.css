@@ -1,5 +1,3 @@
-/* ---------------- БАЗОВЫЕ СТИЛИ ---------------- */
-
 * {
   margin: 0;
   padding: 0;
@@ -16,8 +14,13 @@ body {
   font-family: Arial, sans-serif;
 }
 
-/* ---------------- КНОПКА ДОБАВИТЬ ---------------- */
+/* Обёртка экрана для анимации с USB */
+#screenWrapper {
+  position: relative;
+  transition: transform 0.8s ease;
+}
 
+/* Кнопка "Добавить файл" */
 #addBtnFolder {
   position: fixed;
   bottom: 30px;
@@ -33,14 +36,12 @@ body {
   z-index: 100;
 }
 
-/* ---------------- ПАПКА ---------------- */
-
+/* Папка */
 .container {
   position: relative;
   width: 440px;
   height: 560px;
   perspective: 2600px;
-  cursor: pointer;
 }
 
 .cover {
@@ -59,6 +60,7 @@ body {
   transform-origin: left;
   transition: transform 1.6s ease;
   z-index: 10;
+  cursor: pointer;
 }
 
 .folder.open .cover {
@@ -94,6 +96,7 @@ body {
   position: relative;
 }
 
+/* Страницы как стопка */
 .page {
   position: absolute;
   width: 82%;
@@ -105,7 +108,13 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  transition: transform 0.65s cubic-bezier(0.25,0.8,0.25,1);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.folder:not(.open) .page {
+  transform: translate(-50%, -50%) rotate(calc(var(--i) * 2deg));
 }
 
 .page img,
@@ -115,12 +124,7 @@ body {
   object-fit: contain;
 }
 
-.page.active { z-index: 5; transform: translateX(0) scale(1); }
-.page.to-left { z-index: 3; transform: translateX(-500px) rotate(-12deg); }
-.page.next { z-index: 4; transform: translateX(40px) rotate(3deg); }
-
-/* ---------------- USB ИКОНКА ---------------- */
-
+/* USB иконка */
 .usb {
   position: absolute;
   right: -60px;
@@ -157,8 +161,22 @@ body {
   text-shadow: 0 0 5px #0f0;
 }
 
-/* ---------------- USB ОКНО ---------------- */
+/* Анимация "втыкания" USB */
+.usb-insert {
+  animation: insertUsb 0.8s forwards;
+}
 
+@keyframes insertUsb {
+  0% { transform: translateY(-50%) translateX(0); }
+  100% { transform: translateY(-50%) translateX(-40px); }
+}
+
+/* Сдвиг экрана при USB */
+.screen-slide {
+  transform: translateX(-200px);
+}
+
+/* USB окно */
 .usb-modal {
   position: fixed;
   inset: 0;
@@ -213,7 +231,8 @@ body {
 }
 
 .usb-item img,
-.usb-item video {
+.usb-item video,
+.usb-item iframe {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -238,8 +257,7 @@ body {
   cursor: pointer;
 }
 
-/* ---------------- МОДАЛКА ДОБАВЛЕНИЯ ---------------- */
-
+/* Общие модалки */
 .modal {
   position: fixed;
   inset: 0;
@@ -254,6 +272,7 @@ body {
   display: flex;
 }
 
+/* Модалка добавления */
 .add-modal-inner {
   background: #fff;
   padding: 30px;
@@ -274,14 +293,19 @@ body {
   font-size: 16px;
 }
 
-/* ---------------- ПОЛНОЭКРАННЫЙ ПРОСМОТР ---------------- */
-
+/* Полноэкранный просмотр */
 #viewerModal {
   z-index: 3000;
 }
 
+.viewer-content {
+  max-width: 96vw;
+  max-height: 96vh;
+}
+
 .viewer-content img,
-.viewer-content video {
+.viewer-content video,
+.viewer-content iframe {
   max-width: 96vw;
   max-height: 96vh;
 }
@@ -309,17 +333,14 @@ body {
   user-select: none;
 }
 
+.folder:not(.open) .page { z-index: 1 !important; }
+.cover { z-index: 50; }
+
 .viewer-arrow-left { left: 20px; }
 .viewer-arrow-right { right: 20px; }
 
 /* Кликабельные зоны */
-.viewer-zone {
-  position: absolute;
-  top: 0;
-  width: 25%;
-  height: 100%;
-  z-index: 3000;
-}
+.viewer-zone { top: 80px; /* крестик выше этой зоны */ height: calc(100% - 80px); }
 
 .viewer-zone-left { left: 0; }
 .viewer-zone-right { right: 0; }
@@ -339,4 +360,5 @@ body {
   cursor: pointer;
   display: none;
   z-index: 3200;
+  transition: opacity 0.2s;
 }
