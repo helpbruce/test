@@ -10,6 +10,7 @@ let usbFiles = JSON.parse(localStorage.getItem("usbFiles") || "[]");
 ========================== */
 
 const folder = document.getElementById("folder");
+const cover = folder.querySelector(".cover");
 const stack = document.getElementById("stack");
 
 const usbIcon = document.getElementById("usbIcon");
@@ -30,16 +31,59 @@ const viewerContent = document.getElementById("viewerContent");
 const viewerClose = document.getElementById("viewerClose");
 const deleteBtn = document.getElementById("deleteBtn");
 
+const viewerPrev = document.getElementById("viewerPrev");
+const viewerNext = document.getElementById("viewerNext");
+const viewerZoneLeft = document.getElementById("viewerZoneLeft");
+const viewerZoneRight = document.getElementById("viewerZoneRight");
+
+const screenWrapper = document.getElementById("screenWrapper");
+
 /* ==========================
-   ОТКРЫТИЕ / ЗАКРЫТИЕ ПАПКИ
+   ТЕКУЩЕЕ СОСТОЯНИЕ
 ========================== */
 
-folder.addEventListener("click", () => {
-  folder.classList.toggle("open");
-});
+let currentSource = "folder";
+let currentIndex = 0;
 
 /* ==========================
-   ОКНО ДОБАВЛЕНИЯ ФАЙЛА
+   УТИЛИТЫ
+========================== */
+
+function isVideoUrl(url) {
+  return /\.(mp4|webm|ogg)$/i.test(url);
+}
+
+function isGoogleDrive(url) {
+  return url.includes("drive.google.com");
+}
+
+function googleDriveToDirect(url) {
+  const match = url.match(/\/d\/(.*?)\//);
+  if (!match) return url;
+  const id = match[1];
+  return `https://drive.google.com/uc?export=download&id=${id}`;
+}
+
+/* ==========================
+   ПАПКА ОТКРЫТИЕ/ЗАКРЫТИЕ
+========================== */
+
+cover.onclick = () => {
+  folder.classList.toggle("open");
+  highlightActivePage();
+};
+
+function openFolder() {
+  folder.classList.add("open");
+  highlightActivePage();
+}
+
+function closeFolder() {
+  folder.classList.remove("open");
+}
+
+/* ==========================
+   ОКНО ДОБАВЛЕНИЯ
 ========================== */
 
 addBtnFolder.onclick = () => {
@@ -66,16 +110,16 @@ confirmAdd.onclick = () => {
   const url = fileUrlInput.value.trim();
   if (!url) return;
 
-  if (addContext.value === "folder") {
-    documents.push(url);
-    localStorage.setItem("documents", JSON.stringify(documents));
-    createDocumentPage(url);
-  }
-
   if (addContext.value === "usb") {
     usbFiles.push(url);
     localStorage.setItem("usbFiles", JSON.stringify(usbFiles));
     renderUsbFiles();
+  }
+
+  else if (addContext.value === "folder") {
+    documents.push(url);
+    localStorage.setItem("documents", JSON.stringify(documents));
+    rebuildDocuments();
   }
 
   addModal.classList.remove("open");
@@ -85,16 +129,27 @@ confirmAdd.onclick = () => {
    СОЗДАНИЕ СТРАНИЦ В ПАПКЕ
 ========================== */
 
-function createDocumentPage(url) {
+function createDocumentPage(url, index) {
   const page = document.createElement("div");
   page.className = "page";
+  page.style.setProperty("--i", index);
 
-  if (url.match(/\.(mp4|webm|ogg)$/i)) {
+  if (isGoogleDrive(url)) {
+    const direct = googleDriveToDirect(url);
+    const v = document.createElement("video");
+    v.src = direct;
+    v.controls = false;
+    page.appendChild(v);
+  }
+
+  else if (isVideoUrl(url)) {
     const v = document.createElement("video");
     v.src = url;
     v.controls = false;
     page.appendChild(v);
-  } else {
+  }
+
+  else {
     const img = document.createElement("img");
     img.src = url;
     page.appendChild(img);
@@ -102,29 +157,62 @@ function createDocumentPage(url) {
 
   page.onclick = (e) => {
     e.stopPropagation();
-    openViewer("folder", url);
+    openViewer("folder", index);
   };
 
   stack.appendChild(page);
+}
+
+function rebuildDocuments() {
+  stack.innerHTML = "";
+  documents.forEach((url, i) => createDocumentPage(url, i));
+  highlightActivePage();
+}
+
+/* ==========================
+   ВИЗУАЛЬНОЕ ЛИСТАНИЕ В ПАПКЕ
+========================== */
+
+function highlightActivePage() {
+  const pages = document.querySelectorAll(".page");
+
+  pages.forEach((p, i) => {
+    if (i === currentIndex) {
+      p.style.transform = "translate(-50%, -50%) scale(1)";
+      p.style.zIndex = 10;
+    } else if (i < currentIndex) {
+      p.style.transform = "translate(-60%, -50%) rotate(-8deg)";
+      p.style.zIndex = 5;
+    } else {
+      p.style.transform = "translate(-40%, -50%) rotate(8deg)";
+      p.style.zIndex = 5;
+    }
+  });
 }
 
 /* ==========================
    ЗАГРУЗКА ДОКУМЕНТОВ
 ========================== */
 
-documents.forEach(url => createDocumentPage(url));
+rebuildDocuments();
 
 /* ==========================
    USB ОКНО
 ========================== */
 
 usbIcon.onclick = () => {
-  usbModal.classList.add("open");
-  renderUsbFiles();
+  screenWrapper.classList.add("screen-slide");
+  usbIcon.classList.add("usb-insert");
+
+  setTimeout(() => {
+    usbModal.classList.add("open");
+  }, 800);
 };
 
 usbClose.onclick = () => {
   usbModal.classList.remove("open");
+  screenWrapper.classList.remove("screen-slide");
+  usbIcon.classList.remove("usb-insert");
 };
 
 /* ==========================
@@ -134,41 +222,47 @@ usbClose.onclick = () => {
 function renderUsbFiles() {
   usbGrid.innerHTML = "";
 
-  usbFiles.forEach(url => {
+  usbFiles.forEach((url, index) => {
     const item = document.createElement("div");
     item.className = "usb-item";
 
-    if (url.match(/\.(mp4|webm|ogg)$/i)) {
+    if (isGoogleDrive(url)) {
+      const direct = googleDriveToDirect(url);
+      const v = document.createElement("video");
+      v.src = direct;
+      v.controls = false;
+      item.appendChild(v);
+    }
+
+    else if (isVideoUrl(url)) {
       const v = document.createElement("video");
       v.src = url;
       item.appendChild(v);
-    } else {
+    }
+
+    else {
       const img = document.createElement("img");
       img.src = url;
       item.appendChild(img);
     }
 
-    item.onclick = () => openViewer("usb", url);
+    item.onclick = () => openViewer("usb", index);
 
     usbGrid.appendChild(item);
   });
 }
 
+renderUsbFiles();
+
 /* ==========================
    ПОЛНОЭКРАННЫЙ ПРОСМОТР
 ========================== */
 
-let currentSource = null;   // folder / usb
-let currentIndex = null;    // индекс в своей базе
-
-function openViewer(source, url) {
+function openViewer(source, index) {
   currentSource = source;
+  currentIndex = index;
 
-  const base = source === "folder" ? documents : usbFiles;
-  currentIndex = base.indexOf(url);
-
-  showViewerContent(url);
-
+  updateViewer();
   viewerModal.classList.add("open");
   deleteBtn.style.display = "block";
 }
@@ -176,17 +270,35 @@ function openViewer(source, url) {
 function showViewerContent(url) {
   viewerContent.innerHTML = "";
 
-  if (url.match(/\.(mp4|webm|ogg)$/i)) {
+  if (isGoogleDrive(url)) {
+    const direct = googleDriveToDirect(url);
+    const v = document.createElement("video");
+    v.src = direct;
+    v.controls = true;
+    v.autoplay = false;
+    viewerContent.appendChild(v);
+    return;
+  }
+
+  if (isVideoUrl(url)) {
     const v = document.createElement("video");
     v.src = url;
     v.controls = true;
-    v.autoplay = false; // твой выбор B
+    v.autoplay = false;
     viewerContent.appendChild(v);
-  } else {
-    const img = document.createElement("img");
-    img.src = url;
-    viewerContent.appendChild(img);
+    return;
   }
+
+  const img = document.createElement("img");
+  img.src = url;
+  viewerContent.appendChild(img);
+}
+
+function updateViewer() {
+  const base = currentSource === "folder" ? documents : usbFiles;
+  const url = base[currentIndex];
+  showViewerContent(url);
+  hideDeleteTemporarily();
 }
 
 viewerClose.onclick = () => {
@@ -199,80 +311,37 @@ viewerModal.onclick = (e) => {
   if (e.target === viewerModal) viewerClose.onclick();
 };
 
-/* ==========================
-   УДАЛЕНИЕ ФАЙЛА
-========================== */
-
-deleteBtn.onclick = () => {
-  const base = currentSource === "folder" ? documents : usbFiles;
-
-  const url = base[currentIndex];
-
-  base.splice(currentIndex, 1);
-
-  if (currentSource === "folder") {
-    localStorage.setItem("documents", JSON.stringify(base));
-    stack.innerHTML = "";
-    documents.forEach(url => createDocumentPage(url));
-  } else {
-    localStorage.setItem("usbFiles", JSON.stringify(base));
-    renderUsbFiles();
-  }
-
-  viewerClose.onclick();
+viewerContent.onclick = (e) => {
+  e.stopPropagation();
 };
+
 /* ==========================
-   ЧАСТЬ 4 — ПОЛНОЭКРАННОЕ ЛИСТАНИЕ
+   ЛИСТАНИЕ
 ========================== */
-
-const viewerPrev = document.getElementById("viewerPrev");
-const viewerNext = document.getElementById("viewerNext");
-
-const viewerZoneLeft = document.getElementById("viewerZoneLeft");
-const viewerZoneRight = document.getElementById("viewerZoneRight");
-
-/* --------------------------
-   ПОКАЗ КОНТЕНТА ПО ИНДЕКСУ
---------------------------- */
-
-function updateViewer() {
-  const base = currentSource === "folder" ? documents : usbFiles;
-  const url = base[currentIndex];
-
-  showViewerContent(url);
-
-  hideDeleteTemporarily();
-}
-
-/* --------------------------
-   ЛИСТАНИЕ НАЗАД
---------------------------- */
 
 function goPrev() {
   const base = currentSource === "folder" ? documents : usbFiles;
 
   if (currentIndex > 0) {
     currentIndex--;
-    updateViewer();
+    if (viewerModal.classList.contains("open")) updateViewer();
+    else highlightActivePage();
+  } else {
+    if (currentSource === "folder" && folder.classList.contains("open") && !viewerModal.classList.contains("open")) {
+      closeFolder();
+    }
   }
 }
-
-/* --------------------------
-   ЛИСТАНИЕ ВПЕРЁД
---------------------------- */
 
 function goNext() {
   const base = currentSource === "folder" ? documents : usbFiles;
 
   if (currentIndex < base.length - 1) {
     currentIndex++;
-    updateViewer();
+    if (viewerModal.classList.contains("open")) updateViewer();
+    else highlightActivePage();
   }
 }
-
-/* --------------------------
-   СТРЕЛКИ
---------------------------- */
 
 viewerPrev.onclick = (e) => {
   e.stopPropagation();
@@ -284,10 +353,6 @@ viewerNext.onclick = (e) => {
   goNext();
 };
 
-/* --------------------------
-   КЛИКАБЕЛЬНЫЕ ЗОНЫ
---------------------------- */
-
 viewerZoneLeft.onclick = (e) => {
   e.stopPropagation();
   goPrev();
@@ -298,20 +363,59 @@ viewerZoneRight.onclick = (e) => {
   goNext();
 };
 
-/* --------------------------
-   ЛИСТАНИЕ СТРЕЛКАМИ КЛАВИАТУРЫ
---------------------------- */
+/* ==========================
+   КЛАВИАТУРА
+========================== */
 
 document.addEventListener("keydown", (e) => {
-  if (!viewerModal.classList.contains("open")) return;
+  if (e.key === "Escape") {
+    if (viewerModal.classList.contains("open")) viewerClose.onclick();
+    else if (usbModal.classList.contains("open")) usbClose.onclick();
+    else if (addModal.classList.contains("open")) addModal.classList.remove("open");
+  }
 
-  if (e.key === "ArrowLeft") goPrev();
-  if (e.key === "ArrowRight") goNext();
+  if (viewerModal.classList.contains("open")) {
+    if (e.key === "ArrowLeft") goPrev();
+    if (e.key === "ArrowRight") goNext();
+    return;
+  }
+
+  if (e.key === "ArrowRight" && !folder.classList.contains("open")) {
+    openFolder();
+    return;
+  }
+
+  if (folder.classList.contains("open")) {
+    if (e.key === "ArrowRight") goNext();
+    if (e.key === "ArrowLeft") goPrev();
+  }
 });
 
-/* --------------------------
-   ИСЧЕЗНОВЕНИЕ КНОПКИ "УНИЧТОЖИТЬ"
---------------------------- */
+/* ==========================
+   УДАЛЕНИЕ
+========================== */
+
+deleteBtn.onclick = () => {
+  const base = currentSource === "folder" ? documents : usbFiles;
+
+  base.splice(currentIndex, 1);
+
+  if (currentSource === "folder") {
+    localStorage.setItem("documents", JSON.stringify(base));
+    documents = base;
+    rebuildDocuments();
+  } else {
+    localStorage.setItem("usbFiles", JSON.stringify(base));
+    usbFiles = base;
+    renderUsbFiles();
+  }
+
+  viewerClose.onclick();
+};
+
+/* ==========================
+   ПОЯВЛЕНИЕ КНОПКИ "УНИЧТОЖИТЬ"
+========================== */
 
 let deleteTimeout = null;
 
@@ -322,13 +426,5 @@ function hideDeleteTemporarily() {
 
   deleteTimeout = setTimeout(() => {
     deleteBtn.style.opacity = "1";
-  }, 500);
+  }, 1500);
 }
-
-/* --------------------------
-   ЗАПРЕТ ЛИСТАНИЯ ПО КЛИКУ НА ДОКУМЕНТ
---------------------------- */
-
-viewerContent.onclick = (e) => {
-  e.stopPropagation();
-};
