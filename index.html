@@ -6,7 +6,7 @@
 <title>Папка Дела</title>
 
 <style>
-*{
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -317,5 +317,9 @@ document.addEventListener("keydown", (e) => {
 /* ---------- полноэкран ---------- */
 
 document.getElementById("stack").addEventListener("click", (e) => {
-  const page =
+  const page = e.target.closest(".page");
+  if (!page) return;
 
+  modalContent.innerHTML = "";
+
+  const
