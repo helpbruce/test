@@ -49,20 +49,28 @@ let currentIndex = 0;
    УТИЛИТЫ
 ========================== */
 
-function isVideoUrl(url) {
-  return /\.(mp4|webm|ogg)$/i.test(url);
-}
-
 function isGoogleDrive(url) {
   return url.includes("drive.google.com");
 }
 
-function googleDriveToDirect(url) {
-  const match = url.match(/\/d\/(.*?)\//);
-  if (!match) return url;
-  const id = match[1];
-  return `https://drive.google.com/uc?export=download&id=${id}`;
+function googleDriveToPreview(url) {
+  let id = null;
+
+  // Формат /file/d/ID/
+  let match = url.match(/\/d\/([^/]+)/);
+  if (match) id = match[1];
+
+  // Формат ?id=ID
+  if (!id) {
+    match = url.match(/id=([^&]+)/);
+    if (match) id = match[1];
+  }
+
+  if (!id) return url;
+
+  return `https://drive.google.com/file/d/${id}/preview`;
 }
+
 
 /* ==========================
    ПАПКА ОТКРЫТИЕ/ЗАКРЫТИЕ
@@ -135,18 +143,11 @@ function createDocumentPage(url, index) {
   page.style.setProperty("--i", index);
 
   if (isGoogleDrive(url)) {
-    const direct = googleDriveToDirect(url);
-    const v = document.createElement("video");
-    v.src = direct;
-    v.controls = false;
-    page.appendChild(v);
-  }
-
-  else if (isVideoUrl(url)) {
-    const v = document.createElement("video");
-    v.src = url;
-    v.controls = false;
-    page.appendChild(v);
+    const iframe = document.createElement("iframe");
+    iframe.src = googleDriveToPreview(url);
+    iframe.frameBorder = "0";
+    iframe.allowFullscreen = true;
+    page.appendChild(iframe);
   }
 
   else {
@@ -227,24 +228,20 @@ function renderUsbFiles() {
     item.className = "usb-item";
 
     if (isGoogleDrive(url)) {
-      const direct = googleDriveToDirect(url);
-      const v = document.createElement("video");
-      v.src = direct;
-      v.controls = false;
-      item.appendChild(v);
-    }
-
-    else if (isVideoUrl(url)) {
-      const v = document.createElement("video");
-      v.src = url;
-      item.appendChild(v);
+      const iframe = document.createElement("iframe");
+      iframe.src = googleDriveToPreview(url);
+      iframe.frameBorder = "0";
+      iframe.allowFullscreen = true;
+      item.appendChild(iframe);
     }
 
     else {
-      const img = document.createElement("img");
-      img.src = url;
-      item.appendChild(img);
-    }
+  // Если не Google Drive — показываем картинку
+  const img = document.createElement("img");
+  img.src = url;
+  item.appendChild(img);
+}
+
 
     item.onclick = () => openViewer("usb", index);
 
@@ -271,21 +268,13 @@ function showViewerContent(url) {
   viewerContent.innerHTML = "";
 
   if (isGoogleDrive(url)) {
-    const direct = googleDriveToDirect(url);
-    const v = document.createElement("video");
-    v.src = direct;
-    v.controls = true;
-    v.autoplay = false;
-    viewerContent.appendChild(v);
-    return;
-  }
-
-  if (isVideoUrl(url)) {
-    const v = document.createElement("video");
-    v.src = url;
-    v.controls = true;
-    v.autoplay = false;
-    viewerContent.appendChild(v);
+    const iframe = document.createElement("iframe");
+    iframe.src = googleDriveToPreview(url);
+    iframe.frameBorder = "0";
+    iframe.allowFullscreen = true;
+    iframe.style.width = "100%";
+    iframe.style.height = "100%";
+    viewerContent.appendChild(iframe);
     return;
   }
 
